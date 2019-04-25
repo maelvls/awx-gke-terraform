@@ -1,0 +1,30 @@
+rbac: {enabled: true}
+accessLogs: {enabled: true}
+ssl: {enabled: true, enforced: true}
+
+# https://docs.cert-manager.io/en/latest/tasks/issuing-certificates/ingress-shim.html#
+dashboard:
+  enabled: true
+  domain: traefik.k8s.touist.eu
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    tls:
+      - hosts: [traefik.k8s.touist.eu]
+        secretName: traefik-example-tls
+
+kubernetes:
+  namespaces:
+    - awx
+    - default
+    - kube-system
+
+
+
+# We use cloudflare. As soon as the LoadBalancer has an external IP, I want
+# to add a 'A' record to cloudflare.
+# https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/cloudflare.md
+service:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "*.k8s.touist.eu"

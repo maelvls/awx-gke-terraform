@@ -1,0 +1,10 @@
+# https://docs.cert-manager.io/en/latest/tasks/issuing-certificates/ingress-shim.html#
+ingress:
+  enabled: true
+  hosts: [dashboard.k8s.touist.eu]
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+  tls:
+    - hosts: [dashboard.k8s.touist.eu]
+      secretName: dashboard-example-tls

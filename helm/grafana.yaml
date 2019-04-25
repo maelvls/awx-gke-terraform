@@ -1,0 +1,16 @@
+# https://docs.cert-manager.io/en/latest/tasks/issuing-certificates/ingress-shim.html#
+ingress:
+  enabled: true
+  hosts: [grafana.k8s.touist.eu]
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+  tls:
+    - hosts: [grafana.k8s.touist.eu]
+      secretName: grafana-example-tls
+# dashboards:
+  # Ref: https://grafana.com/dashboards/10000
+  # cluster-monitoring:
+  #   - gnetId: 10000
+  #   - revision: 1
+  #   - datasource: Prometheus

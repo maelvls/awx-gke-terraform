@@ -1,0 +1,6 @@
+.terraform
+installer/
+awx/
+.envrc
+ansible-awx-helm-chart/
+variables.tfvars

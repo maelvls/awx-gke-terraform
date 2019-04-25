@@ -1,0 +1,7 @@
+provider: cloudflare
+cloudflare:
+  apiKey: ad9c63f01c01cac63f01cadb5e76901cacc63f
+  email: email@foo.com
+  proxied: false
+rbac:
+  create: true
