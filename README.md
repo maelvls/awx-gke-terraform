@@ -18,13 +18,14 @@ kubectl apply -f k8s/cert-manager-issuers.yaml
 
 helm install stable/external-dns --name external-dns --values helm/external-dns.yaml --set cloudflare.email=$CF_API_EMAIL --set cloudflare.apiKey=$CF_API_KEY
 helm install stable/traefik --name traefik --values helm/traefik.yaml --namespace kube-system
-helm install stable/prometheus --name prometheus --values helm/prometheus.yaml --namespace kube-system
 helm install stable/kubernetes-dashboard --name kubernetes-dashboard --values helm/kubernetes-dashboard.yaml --namespace kube-system
-helm install stable/grafana --name grafana --values helm/grafana.yaml --namespace kube-system
+
+helm install stable/prometheus-operator --name operator --namespace kube-system --values helm/operator.yaml
+kubectl apply -f k8s/grafana-dashboards.yaml
 
 git clone https://github.com/arthur-c/ansible-awx-helm-chart
 helm dependency update ./ansible-awx-helm-chart/awx
-helm install --name awx ./ansible-awx-helm-chart/awx --values helm/awx.yaml
+helm install --name awx ./ansible-awx-helm-chart/awx --namespace awx --values helm/awx.yaml
 ```
 
 ## Kubernetes config management
