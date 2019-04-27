@@ -2,7 +2,29 @@
 
 ![kubernetes-awx](https://user-images.githubusercontent.com/2195781/56848717-75d56280-68ec-11e9-8b6e-36fee9fbb712.png)
 
-Steps:
+Infra-as-code (terraform + helm) for creating a Kubernetes cluster with AWX
+(Ansible Tower) and featuring
+
+- external DNS (Cloudflare) configured dynamically by the cluster when the
+  LoadBalancer (traefik) gets its external IP
+- Letsencrypt certificates rotated automatically on a per-ingress basis
+- Metrics using prometheus operator (prometheus, node exporter,
+  alertmanager, kube-state-metrics) with grafana on
+  <https://grafana.k8s.touist.eu>
+- Kubernetes dashboard + heapster
+- and of course AWX on <https://awx.k8s.touist.eu> (admin/password)
+
+The whole thing should fit on a single `n1-standard-4` node (4 vCPUs, 15GB
+RAM), although it should be better with a least two nodes (memcached will
+complain about not being able to scale two replicas on two different
+nodes).
+
+Before going:
+
+1. log into `gcloud init`
+2. export CF_API_EMAIL and CF_API_KEY (toke for Cloudflare)
+
+Then:
 
 ```sh
 terraform apply -var-file=variables.tfvars
@@ -28,6 +50,17 @@ kubectl apply -f k8s/grafana-dashboards.yaml
 git clone https://github.com/arthur-c/ansible-awx-helm-chart
 helm dependency update ./ansible-awx-helm-chart/awx
 helm install --name awx ./ansible-awx-helm-chart/awx --namespace awx --values helm/awx.yaml
+```
+
+## Launching the Kubernetes Dashboard
+
+Instructions: <https://github.com/kubernetes/dashboard/wiki/Creating-sample-user>
+
+```sh
+kubectl apply -f k8s/kubernetes-dashboard-user.yaml
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+kubectl proxy
+open http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy
 ```
 
 ## Kubernetes config management
