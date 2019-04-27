@@ -1,5 +1,7 @@
 # AWX (Ansible Tower) on GKE using Terraform
 
+![kubernetes-awx](https://user-images.githubusercontent.com/2195781/56848717-75d56280-68ec-11e9-8b6e-36fee9fbb712.png)
+
 Steps:
 
 ```sh
