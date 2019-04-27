@@ -22,7 +22,7 @@ nodes).
 Before going:
 
 1. log into `gcloud init`
-2. export CF_API_EMAIL and CF_API_KEY (toke for Cloudflare)
+2. export CF_API_EMAIL and CF_API_KEY (for Cloudflare's DNS)
 
 Then:
 
