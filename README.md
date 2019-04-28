@@ -22,13 +22,15 @@ nodes).
 Before going:
 
 1. log into `gcloud init`
-2. export CF_API_EMAIL and CF_API_KEY (for Cloudflare's DNS)
+2. rename `.envrc.example` to `.envrc` and fill the `CF_API_EMAIL` and
+   `CF_API_KEY` (for Cloudflare's DNS)
 
 Then:
 
 ```sh
 terraform apply -var-file=variables.tfvars
 ./post-install.sh
+source .envrc # if you have direnv, skip this
 
 kubectl apply -f k8s/helm-tiller-rbac.yml
 helm init --service-account tiller --history-max 200
