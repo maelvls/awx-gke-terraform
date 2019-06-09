@@ -1,7 +1,7 @@
 resource "google_container_cluster" "k8s-cluster" {
   name                     = "august-period-234610"
   remove_default_node_pool = true
-  min_master_version       = "1.12.7-gke.7"
+  # min_master_version       = "1.12.7-gke.7"
   zone                     = "europe-west1-d"
 
   master_auth {
