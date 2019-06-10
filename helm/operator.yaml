@@ -1,34 +1,34 @@
 prometheus:
   ingress:
     enabled: true
-    hosts: [prometheus.k8s.touist.eu]
+    hosts: [prometheus.kube.maelvls.dev]
     annotations:
       kubernetes.io/ingress.class: traefik
       certmanager.k8s.io/cluster-issuer: letsencrypt-prod
     tls:
-      - hosts: [prometheus.k8s.touist.eu]
+      - hosts: [prometheus.kube.maelvls.dev]
         secretName: prometheus-example-tls
 
 alertmanager:
   ingress:
     enabled: true
-    hosts: [alertmanager.k8s.touist.eu]
+    hosts: [alertmanager.kube.maelvls.dev]
     annotations:
       kubernetes.io/ingress.class: traefik
       certmanager.k8s.io/cluster-issuer: letsencrypt-prod
     tls:
-      - hosts: [alertmanager.k8s.touist.eu]
+      - hosts: [alertmanager.kube.maelvls.dev]
         secretName: alertmanager-example-tls
 
 grafana:
   ingress:
     enabled: true
-    hosts: [grafana.k8s.touist.eu]
+    hosts: [grafana.kube.maelvls.dev]
     annotations:
       kubernetes.io/ingress.class: traefik
       certmanager.k8s.io/cluster-issuer: letsencrypt-prod
     tls:
-      - hosts: [grafana.k8s.touist.eu]
+      - hosts: [grafana.kube.maelvls.dev]
         secretName: grafana-example-tls
   sidecar:
     dashboards: { enabled: true }

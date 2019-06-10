@@ -1,9 +1,11 @@
+image:
+  tag: latest
 ingress:
   enabled: true
-  hosts: [awx.kube.maelvls.dev]
+  hosts: [quote.kube.maelvls.dev]
   annotations:
     kubernetes.io/ingress.class: traefik
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
   tls:
-    - hosts: [awx.kube.maelvls.dev]
-      secretName: awx-example-tls
+    - hosts: [quote.kube.maelvls.dev]
+      secretName: quote-example-tls

@@ -1,7 +1,27 @@
-provider: cloudflare
-cloudflare:
-  apiKey: ad9c63f01c01cac63f01cadb5e76901cacc63f
-  email: email@foo.com
-  proxied: false
+# https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/gke.md
+# https://github.com/helm/charts/tree/master/stable/external-dns
+# http://tech.paulcz.net/kubernetes-cookbook/gcp/gcp-external-dns/
+
+sources: [service, ingress]
+
+# When using the Google provider, specify the Google project (required when provider=google)
+provider: google
+google:
+  project: "august-period-234610"
+  serviceAccountSecret: "external-dns" # kubectl get secret
+
+# domainFilters: ["kube.maelvls.dev"]
+
+# These help tell which records are owned by external-dns.
+registry: "txt"
+txtOwnerId: "k8s"
+
+## Limit external-dns resources
+resources:
+  limits: { memory: 50Mi }
+  requests: { memory: 50Mi, cpu: 10m }
+
+## ensure RBAC is enabled
 rbac:
   create: true
+  apiVersion: v1

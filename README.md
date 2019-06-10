@@ -5,29 +5,26 @@
 Infra-as-code (terraform + helm) for creating a Kubernetes cluster with AWX
 (Ansible Tower) and featuring
 
-- external DNS (Cloudflare) configured dynamically by the cluster when the
-  LoadBalancer (traefik) gets its external IP
+- external DNS configured dynamically by the cluster when the LoadBalancer
+  (traefik) gets its external IP. Regarding the fqdn `*.kube.maelvls.dev`:
+  at first, I was using Cloudflare and a domain at Godaddy. Now, I use a
+  Google Domain and Google Cloud DNS.
 - Letsencrypt certificates rotated automatically on a per-ingress basis
 - Metrics using prometheus operator (prometheus, node exporter,
   alertmanager, kube-state-metrics) with grafana on
-  <https://grafana.k8s.touist.eu>
+  <https://grafana.kube.maelvls.dev>
 - Kubernetes dashboard + heapster
-- and of course AWX on <https://awx.k8s.touist.eu> (admin/password)
+- and of course AWX on <https://awx.kube.maelvls.dev> (admin/password)
 
 The whole thing should fit on a single `n1-standard-4` node (4 vCPUs, 15GB
 RAM), although it should be better with a least two nodes (memcached will
 complain about not being able to scale two replicas on two different
 nodes).
 
-Before going:
-
-1. log into `gcloud init`
-2. rename `.envrc.example` to `.envrc` and fill the `CF_API_EMAIL` and
-   `CF_API_KEY` (for Cloudflare's DNS)
-
 Then:
 
 ```sh
+gcloud init
 terraform apply -var-file=variables.tfvars
 ./post-install.sh
 source .envrc # if you have direnv, skip this
@@ -42,7 +39,15 @@ helm install jetstack/cert-manager --name cert-manager --values helm/cert-manage
 
 kubectl apply -f k8s/cert-manager-issuers.yaml
 
-helm install stable/external-dns --name external-dns --values helm/external-dns.yaml --set cloudflare.email=$CF_API_EMAIL --set cloudflare.apiKey=$CF_API_KEY
+# Create a zone first (not idempotent)
+gcloud dns managed-zones create kube --description "DNS zone for kubernetes stuff I do" --dns-name=kube.maelvls.dev
+# Create a service account for managing the DNS records for external-dns
+gcloud iam service-accounts create external-dns --display-name "Service account for ExternalDNS on GCP"
+gcloud projects add-iam-policy-binding august-period-234610 --role='roles/dns.admin' --member='serviceAccount:dns-exporter@august-period-234610.iam.gserviceaccount.com'
+gcloud iam service-accounts keys create credentials.json --iam-account dns-exporter@august-period-234610.iam.gserviceaccount.com
+kubectl create secret generic external-dns --from-file=credentials.json=credentials.json
+helm install stable/external-dns --name external-dns --values helm/external-dns.yaml
+
 helm install stable/traefik --name traefik --values helm/traefik.yaml --namespace kube-system
 helm install stable/kubernetes-dashboard --name kubernetes-dashboard --values helm/kubernetes-dashboard.yaml --namespace kube-system
 
@@ -53,6 +58,15 @@ git clone https://github.com/arthur-c/ansible-awx-helm-chart
 helm dependency update ./ansible-awx-helm-chart/awx
 helm install --name awx ./ansible-awx-helm-chart/awx --namespace awx --values helm/awx.yaml
 ```
+
+## Launch the Traefik dashboard
+
+```sh
+$ kuberctl proxy
+Starting to serve on 127.0.0.1:8001
+```
+
+Then, open: <http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/http:traefik-dashboard:80/proxy/dashboard>
 
 ## Launching the Kubernetes Dashboard
 
@@ -149,4 +163,6 @@ See: <https://www.jeffgeerling.com/blog/2018/fixing-503-service-unavailable-and-
 In order to refresh the certificate issued by LetsEncrypt, just remove the
 corresponding secret:
 
-    kubectl delete secret -n kube-system prometheus-example-tls
+```sh
+kubectl delete secret -n kube-system prometheus-example-tls
+```

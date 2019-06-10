@@ -32,7 +32,7 @@ resource "google_container_cluster" "k8s-cluster" {
 
 resource "google_container_node_pool" "worker" {
   name       = "worker"
-  zone       = "europe-west1-d"
+  location       = "europe-west1"
   cluster    = "${google_container_cluster.k8s-cluster.name}"
   node_count = 1
 
