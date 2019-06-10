@@ -11,7 +11,7 @@ fi
 # Get vars from terraform output
 echo "Retrieving zone and name from tf output..."
 terraform init >/dev/null
-ZONE=$(terraform output -json | jq -r .zone.value)
+ZONE=$(terraform output -json | jq -r .location.value)
 NAME=$(terraform output -json | jq -r .cluster_name.value)
 
 echo "Getting cluster kubeconfig from gcloud..."

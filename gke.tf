@@ -1,8 +1,15 @@
+variable "location" {
+  default     = "europe-west1-d"
+  description = "region (europe-west1) or zone (europe-west1-d)"
+  type        = "string"
+}
+
 resource "google_container_cluster" "k8s-cluster" {
   name                     = "august-period-234610"
   remove_default_node_pool = true
+
   # min_master_version       = "1.12.7-gke.7"
-  zone                     = "europe-west1-d"
+  location = "${var.location}"
 
   master_auth {
     username = ""
@@ -16,6 +23,7 @@ resource "google_container_cluster" "k8s-cluster" {
     kubernetes_dashboard {
       disabled = true
     }
+
     http_load_balancing {
       disabled = true
     }
@@ -32,7 +40,7 @@ resource "google_container_cluster" "k8s-cluster" {
 
 resource "google_container_node_pool" "worker" {
   name       = "worker"
-  location       = "europe-west1"
+  location   = "${var.location}"
   cluster    = "${google_container_cluster.k8s-cluster.name}"
   node_count = 1
 
@@ -58,6 +66,6 @@ output "cluster_name" {
   value = "${google_container_cluster.k8s-cluster.name}"
 }
 
-output "zone" {
-  value = "${google_container_cluster.k8s-cluster.zone}"
+output "location" {
+  value = "${google_container_cluster.k8s-cluster.location}"
 }
