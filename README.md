@@ -25,7 +25,7 @@ Then:
 
 ```sh
 gcloud init
-terraform apply -var-file=variables.tfvars
+terraform apply
 ./post-install.sh
 source .envrc # if you have direnv, skip this
 
@@ -57,6 +57,12 @@ kubectl apply -f k8s/grafana-dashboards.yaml
 git clone https://github.com/arthur-c/ansible-awx-helm-chart
 helm dependency update ./ansible-awx-helm-chart/awx
 helm install --name awx ./ansible-awx-helm-chart/awx --namespace awx --values helm/awx.yaml
+```
+
+In order to destroy:
+
+```sh
+terraform destroy
 ```
 
 ## Launch the Traefik dashboard
