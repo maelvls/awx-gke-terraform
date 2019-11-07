@@ -32,31 +32,44 @@ source .envrc # if you have direnv, skip this
 kubectl apply -f k8s/helm-tiller-rbac.yml
 helm init --service-account tiller --history-max 200
 
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/master/deploy/manifests/00-crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/master/deploy/manifests/00-crds.yaml --validate=false
 helm repo add jetstack https://charts.jetstack.io && helm repo update
-kubectl label namespace kube-system certmanager.k8s.io/disable-validation="true"
+# kubectl label namespace kube-system certmanager.k8s.io/disable-validation=
 helm install jetstack/cert-manager --name cert-manager --values helm/cert-manager.yaml --namespace kube-system
 
 kubectl apply -f k8s/cert-manager-issuers.yaml
 
 # Create a zone first (not idempotent)
-gcloud dns managed-zones create kube --description "DNS zone for kubernetes stuff I do" --dns-name=kube.maelvls.dev
+gcloud dns managed-zones create maelvls --description "My DNS zone" --dns-name=maelvls.dev
 # Create a service account for managing the DNS records for external-dns
-gcloud iam service-accounts create external-dns --display-name "Service account for ExternalDNS on GCP"
+gcloud iam service-accounts create external-dns --display-name "For external-dns"
 gcloud projects add-iam-policy-binding august-period-234610 --role='roles/dns.admin' --member='serviceAccount:dns-exporter@august-period-234610.iam.gserviceaccount.com'
 gcloud iam service-accounts keys create credentials.json --iam-account dns-exporter@august-period-234610.iam.gserviceaccount.com
 kubectl create secret generic external-dns --from-file=credentials.json=credentials.json
-helm install stable/external-dns --name external-dns --values helm/external-dns.yaml
+helm install --name external-dns stable/external-dns --values helm/external-dns.yaml
 
-helm install stable/traefik --name traefik --values helm/traefik.yaml --namespace kube-system
-helm install stable/kubernetes-dashboard --name kubernetes-dashboard --values helm/kubernetes-dashboard.yaml --namespace kube-system
+helm install --name traefik stable/traefik --values helm/traefik.yaml --namespace kube-system
 
-helm install stable/prometheus-operator --name operator --namespace kube-system --values helm/operator.yaml
+helm install --name kubernetes-dashboard stable/kubernetes-dashboard --values helm/kubernetes-dashboard.yaml --namespace kube-system
+
+helm install --name operator stable/prometheus-operator --namespace kube-system --values helm/operator.yaml
 kubectl apply -f k8s/grafana-dashboards.yaml
 
 git clone https://github.com/arthur-c/ansible-awx-helm-chart
 helm dependency update ./ansible-awx-helm-chart/awx
 helm install --name awx ./ansible-awx-helm-chart/awx --namespace awx --values helm/awx.yaml
+```
+
+```sh
+# helm install --name consul stable/consul --namespace kube-system --values helm/consul.yml
+
+gcloud iam service-accounts create vault-store --display-name "For vault storage"
+gcloud projects add-iam-policy-binding august-period-234610 --role='roles/storage.objectAdmin' --member='serviceAccount:vault-store@august-period-234610.iam.gserviceaccount.com'
+gcloud iam service-accounts keys create credentials.json --iam-account vault-store@august-period-234610.iam.gserviceaccount.com
+
+kubectl -n vault create secret generic vault-storage-cred-file --from-file=credentials.json=credentials.json
+helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+helm install --name vault incubator/vault --namespace vault --values helm/vault.yaml
 ```
 
 In order to destroy:

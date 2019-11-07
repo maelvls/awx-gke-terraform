@@ -1,4 +1,4 @@
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata: { name: letsencrypt-staging }
 spec:
@@ -12,9 +12,14 @@ spec:
       # Secret resource used to store the account's private key.
       name: example-issuer-account-key-staging
     # Enable the HTTP01 challenge mechanism for this Issuer
-    http01: {}
+    solvers:
+      - selector: {}
+        http01:
+          ingress:
+            class: traefik
+
 ---
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata: { name: letsencrypt-prod }
 spec:
@@ -28,4 +33,8 @@ spec:
       # Secret resource used to store the account's private key.
       name: example-issuer-account-letsencrypt-prod
     # Enable the HTTP01 challenge mechanism for this Issuer
-    http01: {}
+    solvers:
+      - selector: {}
+        http01:
+          ingress:
+            class: traefik

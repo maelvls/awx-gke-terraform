@@ -5,7 +5,12 @@ ingress:
   hosts: [quote.kube.maelvls.dev]
   annotations:
     kubernetes.io/ingress.class: traefik
-    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    ingress.kubernetes.io/protocol: h2c
   tls:
     - hosts: [quote.kube.maelvls.dev]
       secretName: quote-example-tls
+
+service:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "quote.kube.maelvls.dev"

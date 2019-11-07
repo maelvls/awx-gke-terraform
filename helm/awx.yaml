@@ -3,7 +3,7 @@ ingress:
   hosts: [awx.kube.maelvls.dev]
   annotations:
     kubernetes.io/ingress.class: traefik
-    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-staging
   tls:
     - hosts: [awx.kube.maelvls.dev]
       secretName: awx-example-tls

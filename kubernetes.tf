@@ -1,3 +1,15 @@
+terraform {
+  backend "gcs" {
+    bucket = "terraform-state-august-period-234610"
+    prefix = "gke-terraform/state"
+  }
+}
+
+provider "google" {
+  project = "august-period-234610"
+  region  = "europe-west1"
+}
+
 variable "location" {
   default     = "europe-west1-d"
   description = "region (europe-west1) or zone (europe-west1-d)"
@@ -8,7 +20,6 @@ resource "google_container_cluster" "k8s-cluster" {
   name                     = "august-period-234610"
   remove_default_node_pool = true
 
-  # min_master_version       = "1.12.7-gke.7"
   location = "${var.location}"
 
   master_auth {
@@ -20,22 +31,12 @@ resource "google_container_cluster" "k8s-cluster" {
   monitoring_service = "none"
 
   addons_config {
-    kubernetes_dashboard {
-      disabled = true
-    }
-
     http_load_balancing {
       disabled = true
     }
   }
 
   initial_node_count = 1
-
-  # Uncomment this if creating a new cluster
-  # node_pool {
-  #   name = "default-pool"
-  #   node_count = "0"
-  # }
 }
 
 resource "google_container_node_pool" "worker" {
@@ -44,14 +45,9 @@ resource "google_container_node_pool" "worker" {
   cluster    = "${google_container_cluster.k8s-cluster.name}"
   node_count = 1
 
-  management = {
-    auto_repair  = true
-    auto_upgrade = true
-  }
-
   node_config {
     preemptible  = true
-    machine_type = "n1-standard-4"
+    machine_type = "n1-standard-1"
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",
@@ -68,4 +64,8 @@ output "cluster_name" {
 
 output "location" {
   value = "${google_container_cluster.k8s-cluster.location}"
+}
+resource "google_storage_bucket" "image-store" {
+  name     = "vault1234"
+  location = "EU"
 }
