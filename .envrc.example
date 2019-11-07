@@ -1,3 +1,1 @@
-export CF_API_KEY=sometoken
-export CF_API_EMAIL=azhvqslksqd@gmail.com
 export KUBECONFIG=~/.kube/configs/august-period-234610-gke

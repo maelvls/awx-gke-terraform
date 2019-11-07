@@ -60,18 +60,6 @@ helm dependency update ./ansible-awx-helm-chart/awx
 helm install --name awx ./ansible-awx-helm-chart/awx --namespace awx --values helm/awx.yaml
 ```
 
-```sh
-# helm install --name consul stable/consul --namespace kube-system --values helm/consul.yml
-
-gcloud iam service-accounts create vault-store --display-name "For vault storage"
-gcloud projects add-iam-policy-binding august-period-234610 --role='roles/storage.objectAdmin' --member='serviceAccount:vault-store@august-period-234610.iam.gserviceaccount.com'
-gcloud iam service-accounts keys create credentials.json --iam-account vault-store@august-period-234610.iam.gserviceaccount.com
-
-kubectl -n vault create secret generic vault-storage-cred-file --from-file=credentials.json=credentials.json
-helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-helm install --name vault incubator/vault --namespace vault --values helm/vault.yaml
-```
-
 In order to destroy:
 
 ```sh

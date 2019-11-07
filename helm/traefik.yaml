@@ -20,7 +20,6 @@ kubernetes:
     - default
     - kube-system
     - quote-svc
-    - vault
 
 # We use cloudflare. As soon as the LoadBalancer has an external IP, I want
 # to add a 'A' record to cloudflare.
